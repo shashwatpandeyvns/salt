@@ -1,0 +1,50 @@
+name: Nightly
+
+on:
+  push: {}
+  pull_request: {}
+  schedule:
+    # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#onschedule
+    - cron: '0 3 * * *'  # Every day at 3AM
+
+env:
+  COLUMNS: 160
+  CACHE_SEED: SEED-4  # Bump the number to invalidate all caches
+  RELENV_DATA: "${{ github.workspace }}/.relenv"
+
+permissions:
+  contents: read  # for dorny/paths-filter to fetch a list of changed files
+  pull-requests: read  # for dorny/paths-filter to read pull requests
+
+concurrency:
+  # Concurrency is defined in a way that concurrent builds against branches do
+  # not cancel previous builds.
+  # However, for every new build against the same pull request source branch,
+  # all older builds against that same branch get canceled.
+  group: nightly-${{ github.workflow }}-${{ github.event_name }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    name: CI
+    uses: ./.github/workflows/ci.yml
+
+  cd:
+    name: Deploy Nightly Builds To Staging
+    needs:
+      - ci
+    uses: ./.github/workflows/deploy-nightly.yml
+    with:
+      self-hosted-runners: ${{ fromJSON(needs.ci.outputs.jobs)['self-hosted-runners'] }}
+      github-hosted-runners: ${{ fromJSON(needs.ci.outputs.jobs)['github-hosted-runners'] }}
+      cache-seed: ${{ needs.ci.outputs.cache-seed }}
+      salt-version: "${{ needs.ci.outputs.salt-version }}"
+
+  set-pipeline-exit-status:
+    # This step is just so we can make github require this step, to pass checks
+    # on a pull request instead of requiring all
+    name: Set the ${{ github.workflow }} Pipeline Exit Status
+    if: always()
+    needs:
+      - cd
+    uses: ./.github/workflows/set-workflow-conclusion.yml

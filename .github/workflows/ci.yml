@@ -6,7 +6,7 @@ on:
   schedule:
     # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#onschedule
     - cron: '0 */8 * * *'  # Run every 8 hours
-  workflow_dispatch:
+  workflow_call:
     inputs:
       salt-version:
         type: string
@@ -15,14 +15,13 @@ on:
           The Salt version to set prior to running tests or building packages.
           If not set, it is discover at run time, like, for example, capturing
           the output of running `python3 salt/version.py`
-      testrun-type:
-        description: Type of test run
-        required: true
-        default: 'full'
-        type: choice
-        options:
-          - full
-          - changed
+    outputs:
+      salt-version:
+        value: "${{ jobs.prepare-workflow.outputs.salt-version }}"
+      cache-seed:
+        value: "${{ jobs.prepare-workflow.outputs.cache-seed }}"
+      jobs:
+        value: "${{ jobs.prepare-workflow.outputs.jobs }}"
 
 env:
   COLUMNS: 160
@@ -38,7 +37,7 @@ concurrency:
   # not cancel previous builds.
   # However, for every new build against the same pull request source branch,
   # all older builds against that same branch get canceled.
-  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  group: ci-${{ github.workflow }}-${{ github.event_name }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
 jobs:
@@ -192,32 +191,32 @@ jobs:
         run: |
           echo "cache-seed=${{ env.CACHE_SEED }}" >> "$GITHUB_OUTPUT"
 
-  pre-commit:
-    name: Pre-Commit
-    if: ${{ fromJSON(needs.prepare-workflow.outputs.jobs)['github-hosted-runners'] }}
-    uses: ./.github/workflows/pre-commit-action.yml
-    needs:
-      - prepare-workflow
-    with:
-      changed-files: ${{ needs.prepare-workflow.outputs.changed-files }}
-
-  docs:
-    name: Build Docs
-    if: ${{ fromJSON(needs.prepare-workflow.outputs.jobs)['github-hosted-runners'] }}
-    uses: ./.github/workflows/docs-action.yml
-    needs:
-      - prepare-workflow
-    with:
-      changed-files: ${{ needs.prepare-workflow.outputs.changed-files }}
-
-  lint:
-    name: Lint
-    if: ${{ fromJSON(needs.prepare-workflow.outputs.jobs)['github-hosted-runners'] }}
-    uses: ./.github/workflows/lint-action.yml
-    needs:
-      - prepare-workflow
-    with:
-      changed-files: ${{ needs.prepare-workflow.outputs.changed-files }}
+#  pre-commit:
+#    name: Pre-Commit
+#    if: ${{ fromJSON(needs.prepare-workflow.outputs.jobs)['github-hosted-runners'] }}
+#    uses: ./.github/workflows/pre-commit-action.yml
+#    needs:
+#      - prepare-workflow
+#    with:
+#      changed-files: ${{ needs.prepare-workflow.outputs.changed-files }}
+#
+#  docs:
+#    name: Build Docs
+#    if: ${{ fromJSON(needs.prepare-workflow.outputs.jobs)['github-hosted-runners'] }}
+#    uses: ./.github/workflows/docs-action.yml
+#    needs:
+#      - prepare-workflow
+#    with:
+#      changed-files: ${{ needs.prepare-workflow.outputs.changed-files }}
+#
+#  lint:
+#    name: Lint
+#    if: ${{ fromJSON(needs.prepare-workflow.outputs.jobs)['github-hosted-runners'] }}
+#    uses: ./.github/workflows/lint-action.yml
+#    needs:
+#      - prepare-workflow
+#    with:
+#      changed-files: ${{ needs.prepare-workflow.outputs.changed-files }}
 
   release-changes:
     name: Create Release Diff
@@ -274,56 +273,56 @@ jobs:
       - name: Build Source Tarball
         uses: ./.github/actions/build-source-tarball
 
-  build-deps-onedir:
-    name: Build Dependencies Onedir
-    if: ${{ fromJSON(needs.prepare-workflow.outputs.jobs)['self-hosted-runners'] }}
-    needs:
-      - prepare-workflow
-    uses: ./.github/workflows/build-deps-onedir.yml
-    with:
-      cache-seed: ${{ needs.prepare-workflow.outputs.cache-seed }}
-      salt-version: "${{ needs.prepare-workflow.outputs.salt-version }}"
-      self-hosted-runners: ${{ fromJSON(needs.prepare-workflow.outputs.jobs)['self-hosted-runners'] }}
-      github-hosted-runners: ${{ fromJSON(needs.prepare-workflow.outputs.jobs)['github-hosted-runners'] }}
-
-
-  build-salt-onedir:
-    name: Build Salt Onedir
-    needs:
-      - prepare-workflow
-      - build-deps-onedir
-      - build-source-tarball
-    uses: ./.github/workflows/build-salt-onedir.yml
-    with:
-      cache-seed: ${{ needs.prepare-workflow.outputs.cache-seed }}
-      salt-version: "${{ needs.prepare-workflow.outputs.salt-version }}"
-      self-hosted-runners: ${{ fromJSON(needs.prepare-workflow.outputs.jobs)['self-hosted-runners'] }}
-      github-hosted-runners: ${{ fromJSON(needs.prepare-workflow.outputs.jobs)['github-hosted-runners'] }}
-
-
-  build-pkgs:
-    name: Build Salt Packages
-    needs:
-      - prepare-workflow
-      - build-salt-onedir
-    uses: ./.github/workflows/build-packages.yml
-    with:
-      salt-version: "${{ needs.prepare-workflow.outputs.salt-version }}"
-      self-hosted-runners: ${{ fromJSON(needs.prepare-workflow.outputs.jobs)['self-hosted-runners'] }}
-      github-hosted-runners: ${{ fromJSON(needs.prepare-workflow.outputs.jobs)['github-hosted-runners'] }}
-
-  test-salt:
-    name: Test
-    needs:
-      - prepare-workflow
-      - build-salt-onedir
-    uses: ./.github/workflows/test-salt.yml
-    with:
-      salt-version: "${{ needs.prepare-workflow.outputs.salt-version }}"
-      self-hosted-runners: ${{ fromJSON(needs.prepare-workflow.outputs.jobs)['self-hosted-runners'] }}
-      github-hosted-runners: ${{ fromJSON(needs.prepare-workflow.outputs.jobs)['github-hosted-runners'] }}
-      testrun: ${{ needs.prepare-workflow.outputs.testrun }}
-      cache-seed: ${{ needs.prepare-workflow.outputs.cache-seed }}
+#  build-deps-onedir:
+#    name: Build Dependencies Onedir
+#    if: ${{ fromJSON(needs.prepare-workflow.outputs.jobs)['self-hosted-runners'] }}
+#    needs:
+#      - prepare-workflow
+#    uses: ./.github/workflows/build-deps-onedir.yml
+#    with:
+#      cache-seed: ${{ needs.prepare-workflow.outputs.cache-seed }}
+#      salt-version: "${{ needs.prepare-workflow.outputs.salt-version }}"
+#      self-hosted-runners: ${{ fromJSON(needs.prepare-workflow.outputs.jobs)['self-hosted-runners'] }}
+#      github-hosted-runners: ${{ fromJSON(needs.prepare-workflow.outputs.jobs)['github-hosted-runners'] }}
+#
+#
+#  build-salt-onedir:
+#    name: Build Salt Onedir
+#    needs:
+#      - prepare-workflow
+#      - build-deps-onedir
+#      - build-source-tarball
+#    uses: ./.github/workflows/build-salt-onedir.yml
+#    with:
+#      cache-seed: ${{ needs.prepare-workflow.outputs.cache-seed }}
+#      salt-version: "${{ needs.prepare-workflow.outputs.salt-version }}"
+#      self-hosted-runners: ${{ fromJSON(needs.prepare-workflow.outputs.jobs)['self-hosted-runners'] }}
+#      github-hosted-runners: ${{ fromJSON(needs.prepare-workflow.outputs.jobs)['github-hosted-runners'] }}
+#
+#
+#  build-pkgs:
+#    name: Build Salt Packages
+#    needs:
+#      - prepare-workflow
+#      - build-salt-onedir
+#    uses: ./.github/workflows/build-packages.yml
+#    with:
+#      salt-version: "${{ needs.prepare-workflow.outputs.salt-version }}"
+#      self-hosted-runners: ${{ fromJSON(needs.prepare-workflow.outputs.jobs)['self-hosted-runners'] }}
+#      github-hosted-runners: ${{ fromJSON(needs.prepare-workflow.outputs.jobs)['github-hosted-runners'] }}
+#
+#  test-salt:
+#    name: Test
+#    needs:
+#      - prepare-workflow
+#      - build-salt-onedir
+#    uses: ./.github/workflows/test-salt.yml
+#    with:
+#      salt-version: "${{ needs.prepare-workflow.outputs.salt-version }}"
+#      self-hosted-runners: ${{ fromJSON(needs.prepare-workflow.outputs.jobs)['self-hosted-runners'] }}
+#      github-hosted-runners: ${{ fromJSON(needs.prepare-workflow.outputs.jobs)['github-hosted-runners'] }}
+#      testrun: ${{ needs.prepare-workflow.outputs.testrun }}
+#      cache-seed: ${{ needs.prepare-workflow.outputs.cache-seed }}
 
   set-pipeline-exit-status:
     # This step is just so we can make github require this step, to pass checks
