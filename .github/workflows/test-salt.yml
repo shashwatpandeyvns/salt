@@ -1,0 +1,322 @@
+name: Build Salt Packages
+
+on:
+  workflow_call:
+    inputs:
+      salt-version:
+        type: string
+        required: true
+        description: The Salt version to set prior to building packages.
+      github-hosted-runners:
+        type: boolean
+        required: true
+      self-hosted-runners:
+        type: boolean
+        required: true
+      testrun:
+        type: string
+        required: true
+      cache-seed:
+        type: string
+        required: true
+
+jobs:
+
+  windows-2016:
+    name: Windows 2016
+    if: ${{ inputs.self-hosted-runners }}
+    uses: ./.github/workflows/test-action.yml
+    with:
+      distro-slug: windows-2016
+      nox-session: ci-test-onedir
+      platform: windows
+      arch: amd64
+      testrun: ${{ inputs.testrun }}
+      salt-version: "${{ inputs.salt-version }}"
+      cache-seed: ${{ inputs.cache-seed }}
+
+  windows-2019:
+    name: Windows 2019
+    if: ${{ inputs.self-hosted-runners }}
+    uses: ./.github/workflows/test-action.yml
+    with:
+      distro-slug: windows-2019
+      nox-session: ci-test-onedir
+      platform: windows
+      arch: amd64
+      testrun: ${{ inputs.testrun }}
+      salt-version: "${{ inputs.salt-version }}"
+      cache-seed: ${{ inputs.cache-seed }}
+
+  windows-2022:
+    name: Windows 2022
+    if: ${{ inputs.self-hosted-runners }}
+    uses: ./.github/workflows/test-action.yml
+    with:
+      distro-slug: windows-2022
+      nox-session: ci-test-onedir
+      platform: windows
+      arch: amd64
+      testrun: ${{ inputs.testrun }}
+      salt-version: "${{ inputs.salt-version }}"
+      cache-seed: ${{ inputs.cache-seed }}
+
+  macos-12:
+    name: macOS 12
+    if: ${{ inputs.github-hosted-runners }}
+    uses: ./.github/workflows/test-action-macos.yml
+    with:
+      distro-slug: macos-12
+      nox-session: ci-test-onedir
+      platform: darwin
+      arch: x86_64
+      testrun: ${{ inputs.testrun }}
+      salt-version: "${{ inputs.salt-version }}"
+      cache-seed: ${{ inputs.cache-seed }}
+
+  almalinux-8:
+    name: Alma Linux 8
+    if: ${{ inputs.self-hosted-runners }}
+    uses: ./.github/workflows/test-action.yml
+    with:
+      distro-slug: almalinux-8
+      nox-session: ci-test-onedir
+      platform: linux
+      arch: x86_64
+      testrun: ${{ inputs.testrun }}
+      salt-version: "${{ inputs.salt-version }}"
+      cache-seed: ${{ inputs.cache-seed }}
+
+  almalinux-9:
+    name: Alma Linux 9
+    if: ${{ inputs.self-hosted-runners }}
+    uses: ./.github/workflows/test-action.yml
+    with:
+      distro-slug: almalinux-9
+      nox-session: ci-test-onedir
+      platform: linux
+      arch: x86_64
+      testrun: ${{ inputs.testrun }}
+      salt-version: "${{ inputs.salt-version }}"
+      cache-seed: ${{ inputs.cache-seed }}
+
+  amazonlinux-2:
+    name: Amazon Linux 2
+    if: ${{ inputs.self-hosted-runners }}
+    uses: ./.github/workflows/test-action.yml
+    with:
+      distro-slug: amazonlinux-2
+      nox-session: ci-test-onedir
+      platform: linux
+      arch: x86_64
+      testrun: ${{ inputs.testrun }}
+      salt-version: "${{ inputs.salt-version }}"
+      cache-seed: ${{ inputs.cache-seed }}
+
+  archlinux-lts:
+    name: Arch Linux LTS
+    if: ${{ inputs.self-hosted-runners }}
+    uses: ./.github/workflows/test-action.yml
+    with:
+      distro-slug: archlinux-lts
+      nox-session: ci-test-onedir
+      platform: linux
+      arch: x86_64
+      testrun: ${{ inputs.testrun }}
+      salt-version: "${{ inputs.salt-version }}"
+      cache-seed: ${{ inputs.cache-seed }}
+
+  centos-7:
+    name: CentOS 7
+    if: ${{ inputs.self-hosted-runners }}
+    uses: ./.github/workflows/test-action.yml
+    with:
+      distro-slug: centos-7
+      nox-session: ci-test-onedir
+      platform: linux
+      arch: x86_64
+      testrun: ${{ inputs.testrun }}
+      salt-version: "${{ inputs.salt-version }}"
+      cache-seed: ${{ inputs.cache-seed }}
+
+  centosstream-8:
+    name: CentOS Stream 8
+    if: ${{ inputs.self-hosted-runners }}
+    uses: ./.github/workflows/test-action.yml
+    with:
+      distro-slug: centosstream-8
+      nox-session: ci-test-onedir
+      platform: linux
+      arch: x86_64
+      testrun: ${{ inputs.testrun }}
+      salt-version: "${{ inputs.salt-version }}"
+      cache-seed: ${{ inputs.cache-seed }}
+
+  centosstream-9:
+    name: CentOS Stream 9
+    if: ${{ inputs.self-hosted-runners }}
+    uses: ./.github/workflows/test-action.yml
+    with:
+      distro-slug: centosstream-9
+      nox-session: ci-test-onedir
+      platform: linux
+      arch: x86_64
+      testrun: ${{ inputs.testrun }}
+      salt-version: "${{ inputs.salt-version }}"
+      cache-seed: ${{ inputs.cache-seed }}
+
+  debian-10:
+    name: Debian 10
+    if: ${{ inputs.self-hosted-runners }}
+    uses: ./.github/workflows/test-action.yml
+    with:
+      distro-slug: debian-10
+      nox-session: ci-test-onedir
+      platform: linux
+      arch: x86_64
+      testrun: ${{ inputs.testrun }}
+      salt-version: "${{ inputs.salt-version }}"
+      cache-seed: ${{ inputs.cache-seed }}
+
+  debian-11:
+    name: Debian 11
+    if: ${{ inputs.self-hosted-runners }}
+    uses: ./.github/workflows/test-action.yml
+    with:
+      distro-slug: debian-11
+      nox-session: ci-test-onedir
+      platform: linux
+      arch: x86_64
+      testrun: ${{ inputs.testrun }}
+      salt-version: "${{ inputs.salt-version }}"
+      cache-seed: ${{ inputs.cache-seed }}
+
+  debian-11-arm64:
+    name: Debian 11 Arm64
+    if: ${{ inputs.self-hosted-runners }}
+    uses: ./.github/workflows/test-action.yml
+    with:
+      distro-slug: debian-11-arm64
+      nox-session: ci-test-onedir
+      platform: linux
+      arch: aarch64
+      testrun: ${{ inputs.testrun }}
+      salt-version: "${{ inputs.salt-version }}"
+      cache-seed: ${{ inputs.cache-seed }}
+
+  fedora-36:
+    name: Fedora 36
+    if: ${{ inputs.self-hosted-runners }}
+    uses: ./.github/workflows/test-action.yml
+    with:
+      distro-slug: fedora-36
+      nox-session: ci-test-onedir
+      platform: linux
+      arch: x86_64
+      testrun: ${{ inputs.testrun }}
+      salt-version: "${{ inputs.salt-version }}"
+      cache-seed: ${{ inputs.cache-seed }}
+
+  opensuse-15:
+    name: Opensuse 15
+    if: ${{ inputs.self-hosted-runners }}
+    uses: ./.github/workflows/test-action.yml
+    with:
+      distro-slug: opensuse-15
+      nox-session: ci-test-onedir
+      platform: linux
+      arch: x86_64
+      testrun: ${{ inputs.testrun }}
+      salt-version: "${{ inputs.salt-version }}"
+      cache-seed: ${{ inputs.cache-seed }}
+
+  photon-3:
+    name: Photon OS 3
+    if: ${{ inputs.self-hosted-runners }}
+    uses: ./.github/workflows/test-action.yml
+    with:
+      distro-slug: photonos-3
+      nox-session: ci-test-onedir
+      platform: linux
+      arch: x86_64
+      testrun: ${{ inputs.testrun }}
+      salt-version: "${{ inputs.salt-version }}"
+      cache-seed: ${{ inputs.cache-seed }}
+
+  photon-4:
+    name: Photon OS 4
+    if: ${{ inputs.self-hosted-runners }}
+    uses: ./.github/workflows/test-action.yml
+    with:
+      distro-slug: photonos-4
+      nox-session: ci-test-onedir
+      platform: linux
+      arch: x86_64
+      testrun: ${{ inputs.testrun }}
+      salt-version: "${{ inputs.salt-version }}"
+      cache-seed: ${{ inputs.cache-seed }}
+
+  ubuntu-1804:
+    name: Ubuntu 18.04
+    if: ${{ inputs.self-hosted-runners }}
+    uses: ./.github/workflows/test-action.yml
+    with:
+      distro-slug: ubuntu-18.04
+      nox-session: ci-test-onedir
+      platform: linux
+      arch: x86_64
+      testrun: ${{ inputs.testrun }}
+      salt-version: "${{ inputs.salt-version }}"
+      cache-seed: ${{ inputs.cache-seed }}
+
+  ubuntu-2004:
+    name: Ubuntu 20.04
+    if: ${{ inputs.self-hosted-runners }}
+    uses: ./.github/workflows/test-action.yml
+    with:
+      distro-slug: ubuntu-20.04
+      nox-session: ci-test-onedir
+      platform: linux
+      arch: x86_64
+      testrun: ${{ inputs.testrun }}
+      salt-version: "${{ inputs.salt-version }}"
+      cache-seed: ${{ inputs.cache-seed }}
+
+  ubuntu-2004-arm64:
+    name: Ubuntu 20.04 Arm64
+    if: ${{ inputs.self-hosted-runners }}
+    uses: ./.github/workflows/test-action.yml
+    with:
+      distro-slug: ubuntu-20.04-arm64
+      nox-session: ci-test-onedir
+      platform: linux
+      arch: aarch64
+      testrun: ${{ inputs.testrun }}
+      salt-version: "${{ inputs.salt-version }}"
+      cache-seed: ${{ inputs.cache-seed }}
+
+  ubuntu-2204:
+    name: Ubuntu 22.04
+    if: ${{ inputs.self-hosted-runners }}
+    uses: ./.github/workflows/test-action.yml
+    with:
+      distro-slug: ubuntu-22.04
+      nox-session: ci-test-onedir
+      platform: linux
+      arch: x86_64
+      testrun: ${{ inputs.testrun }}
+      salt-version: "${{ inputs.salt-version }}"
+      cache-seed: ${{ inputs.cache-seed }}
+
+  ubuntu-2204-arm64:
+    name: Ubuntu 22.04 Arm64
+    if: ${{ inputs.self-hosted-runners }}
+    uses: ./.github/workflows/test-action.yml
+    with:
+      distro-slug: ubuntu-22.04-arm64
+      nox-session: ci-test-onedir
+      platform: linux
+      arch: aarch64
+      testrun: ${{ inputs.testrun }}
+      salt-version: "${{ inputs.salt-version }}"
+      cache-seed: ${{ inputs.cache-seed }}
