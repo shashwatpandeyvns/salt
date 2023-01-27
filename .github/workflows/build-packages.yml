@@ -29,16 +29,16 @@ jobs:
     with:
       salt-version: "${{ inputs.salt-version }}"
 
-  build-windows-pkgs:
-    name: Build Windows Packages
-    if: ${{ inputs.github-hosted-runners }}
-    uses: ./.github/workflows/build-windows-packages.yml
-    with:
-      salt-version: "${{ inputs.salt-version }}"
-
-  build-macos-pkgs:
-    name: Build macOS Packages
-    if: ${{ inputs.github-hosted-runners }}
-    uses: ./.github/workflows/build-macos-packages.yml
-    with:
-      salt-version: "${{ inputs.salt-version }}"
+#  build-windows-pkgs:
+#    name: Build Windows Packages
+#    if: ${{ inputs.github-hosted-runners }}
+#    uses: ./.github/workflows/build-windows-packages.yml
+#    with:
+#      salt-version: "${{ inputs.salt-version }}"
+#
+#  build-macos-pkgs:
+#    name: Build macOS Packages
+#    if: ${{ inputs.github-hosted-runners }}
+#    uses: ./.github/workflows/build-macos-packages.yml
+#    with:
+#      salt-version: "${{ inputs.salt-version }}"

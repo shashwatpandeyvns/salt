@@ -1,8 +1,8 @@
 name: CI
 
 on:
-  push: {}
-  pull_request: {}
+#  push: {}
+#  pull_request: {}
   schedule:
     # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#onschedule
     - cron: '0 */8 * * *'  # Run every 8 hours
@@ -256,44 +256,44 @@ jobs:
         with:
           salt-version: "${{ needs.prepare-workflow.outputs.salt-version }}"
 
-#  build-deps-onedir:
-#    name: Build Dependencies Onedir
-#    if: ${{ fromJSON(needs.prepare-workflow.outputs.jobs)['self-hosted-runners'] }}
-#    needs:
-#      - prepare-workflow
-#    uses: ./.github/workflows/build-deps-onedir.yml
-#    with:
-#      cache-seed: ${{ needs.prepare-workflow.outputs.cache-seed }}
-#      salt-version: "${{ needs.prepare-workflow.outputs.salt-version }}"
-#      self-hosted-runners: ${{ fromJSON(needs.prepare-workflow.outputs.jobs)['self-hosted-runners'] }}
-#      github-hosted-runners: ${{ fromJSON(needs.prepare-workflow.outputs.jobs)['github-hosted-runners'] }}
-#
-#
-#  build-salt-onedir:
-#    name: Build Salt Onedir
-#    needs:
-#      - prepare-workflow
-#      - build-deps-onedir
-#      - build-source-tarball
-#    uses: ./.github/workflows/build-salt-onedir.yml
-#    with:
-#      cache-seed: ${{ needs.prepare-workflow.outputs.cache-seed }}
-#      salt-version: "${{ needs.prepare-workflow.outputs.salt-version }}"
-#      self-hosted-runners: ${{ fromJSON(needs.prepare-workflow.outputs.jobs)['self-hosted-runners'] }}
-#      github-hosted-runners: ${{ fromJSON(needs.prepare-workflow.outputs.jobs)['github-hosted-runners'] }}
-#
-#
-#  build-pkgs:
-#    name: Build Salt Packages
-#    needs:
-#      - prepare-workflow
-#      - build-salt-onedir
-#    uses: ./.github/workflows/build-packages.yml
-#    with:
-#      salt-version: "${{ needs.prepare-workflow.outputs.salt-version }}"
-#      self-hosted-runners: ${{ fromJSON(needs.prepare-workflow.outputs.jobs)['self-hosted-runners'] }}
-#      github-hosted-runners: ${{ fromJSON(needs.prepare-workflow.outputs.jobs)['github-hosted-runners'] }}
-#
+  build-deps-onedir:
+    name: Build Dependencies Onedir
+    if: ${{ fromJSON(needs.prepare-workflow.outputs.jobs)['self-hosted-runners'] }}
+    needs:
+      - prepare-workflow
+    uses: ./.github/workflows/build-deps-onedir.yml
+    with:
+      cache-seed: ${{ needs.prepare-workflow.outputs.cache-seed }}
+      salt-version: "${{ needs.prepare-workflow.outputs.salt-version }}"
+      self-hosted-runners: ${{ fromJSON(needs.prepare-workflow.outputs.jobs)['self-hosted-runners'] }}
+      github-hosted-runners: ${{ fromJSON(needs.prepare-workflow.outputs.jobs)['github-hosted-runners'] }}
+
+
+  build-salt-onedir:
+    name: Build Salt Onedir
+    needs:
+      - prepare-workflow
+      - build-deps-onedir
+      - build-source-tarball
+    uses: ./.github/workflows/build-salt-onedir.yml
+    with:
+      cache-seed: ${{ needs.prepare-workflow.outputs.cache-seed }}
+      salt-version: "${{ needs.prepare-workflow.outputs.salt-version }}"
+      self-hosted-runners: ${{ fromJSON(needs.prepare-workflow.outputs.jobs)['self-hosted-runners'] }}
+      github-hosted-runners: ${{ fromJSON(needs.prepare-workflow.outputs.jobs)['github-hosted-runners'] }}
+
+
+  build-pkgs:
+    name: Build Salt Packages
+    needs:
+      - prepare-workflow
+      - build-salt-onedir
+    uses: ./.github/workflows/build-packages.yml
+    with:
+      salt-version: "${{ needs.prepare-workflow.outputs.salt-version }}"
+      self-hosted-runners: ${{ fromJSON(needs.prepare-workflow.outputs.jobs)['self-hosted-runners'] }}
+      github-hosted-runners: ${{ fromJSON(needs.prepare-workflow.outputs.jobs)['github-hosted-runners'] }}
+
 #  test-salt:
 #    name: Test
 #    needs:
@@ -314,13 +314,13 @@ jobs:
     if: always()
     runs-on: ubuntu-latest
     needs:
-      - pre-commit
-      - docs
-      - lint
-      - build-deps-onedir
-      - build-salt-onedir
-      - build-pkg
-      - test-salts
+#      - pre-commit
+#      - docs
+#      - lint
+#      - build-deps-onedir
+#      - build-salt-onedir
+      - build-pkgs
+#      - test-salt
     steps:
       - name: Get workflow information
         id: get-workflow-info

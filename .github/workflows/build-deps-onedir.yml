@@ -54,74 +54,74 @@ jobs:
           cache-seed: ${{ inputs.cache-seed }}
 
 
-  build-deps-windows:
-    name: Windows
-    if: ${{ inputs.github-hosted-runners }}
-    strategy:
-      fail-fast: false
-      max-parallel: 2
-      matrix:
-        arch:
-          - x86
-          - amd64
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.10"
-
-      - name: Setup Relenv
-        uses: ./.github/actions/setup-relenv
-        with:
-          platform: windows
-          arch: ${{ matrix.arch }}
-          cache-seed: ${{ inputs.cache-seed }}
-
-      - name: Setup Python Tools Scripts
-        uses: ./.github/actions/setup-python-tools-scripts
-
-      - name: Install Salt Packaging Dependencies into Relenv Onedir
-        uses: ./.github/actions/build-onedir-deps
-        with:
-          platform: windows
-          arch: ${{ matrix.arch }}
-          cache-seed: ${{ inputs.cache-seed }}
-
-
-  build-deps-macos:
-    name: macOS
-    if: ${{ inputs.github-hosted-runners }}
-    strategy:
-      fail-fast: false
-      max-parallel: 2
-      matrix:
-        arch:
-          - x86_64
-    runs-on: macos-12
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.10"
-
-      - name: Setup Relenv
-        uses: ./.github/actions/setup-relenv
-        with:
-          platform: darwin
-          arch: ${{ matrix.arch }}
-          cache-seed: ${{ inputs.cache-seed }}
-
-      - name: Setup Python Tools Scripts
-        uses: ./.github/actions/setup-python-tools-scripts
-
-      - name: Install Salt Packaging Dependencies into Relenv Onedir
-        uses: ./.github/actions/build-onedir-deps
-        with:
-          platform: darwin
-          arch: ${{ matrix.arch }}
-          cache-seed: ${{ inputs.cache-seed }}
+#  build-deps-windows:
+#    name: Windows
+#    if: ${{ inputs.github-hosted-runners }}
+#    strategy:
+#      fail-fast: false
+#      max-parallel: 2
+#      matrix:
+#        arch:
+#          - x86
+#          - amd64
+#    runs-on: windows-latest
+#    steps:
+#      - uses: actions/checkout@v3
+#
+#      - name: Set up Python 3.10
+#        uses: actions/setup-python@v4
+#        with:
+#          python-version: "3.10"
+#
+#      - name: Setup Relenv
+#        uses: ./.github/actions/setup-relenv
+#        with:
+#          platform: windows
+#          arch: ${{ matrix.arch }}
+#          cache-seed: ${{ inputs.cache-seed }}
+#
+#      - name: Setup Python Tools Scripts
+#        uses: ./.github/actions/setup-python-tools-scripts
+#
+#      - name: Install Salt Packaging Dependencies into Relenv Onedir
+#        uses: ./.github/actions/build-onedir-deps
+#        with:
+#          platform: windows
+#          arch: ${{ matrix.arch }}
+#          cache-seed: ${{ inputs.cache-seed }}
+#
+#
+#  build-deps-macos:
+#    name: macOS
+#    if: ${{ inputs.github-hosted-runners }}
+#    strategy:
+#      fail-fast: false
+#      max-parallel: 2
+#      matrix:
+#        arch:
+#          - x86_64
+#    runs-on: macos-12
+#    steps:
+#      - uses: actions/checkout@v3
+#
+#      - name: Set up Python 3.10
+#        uses: actions/setup-python@v4
+#        with:
+#          python-version: "3.10"
+#
+#      - name: Setup Relenv
+#        uses: ./.github/actions/setup-relenv
+#        with:
+#          platform: darwin
+#          arch: ${{ matrix.arch }}
+#          cache-seed: ${{ inputs.cache-seed }}
+#
+#      - name: Setup Python Tools Scripts
+#        uses: ./.github/actions/setup-python-tools-scripts
+#
+#      - name: Install Salt Packaging Dependencies into Relenv Onedir
+#        uses: ./.github/actions/build-onedir-deps
+#        with:
+#          platform: darwin
+#          arch: ${{ matrix.arch }}
+#          cache-seed: ${{ inputs.cache-seed }}
