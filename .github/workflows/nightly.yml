@@ -29,22 +29,54 @@ jobs:
     name: CI
     uses: ./.github/workflows/ci.yml
 
-  cd:
-    name: Deploy Nightly Builds To Staging
+  build-repositories:
+    name: Build Repositories
     needs:
       - ci
-    uses: ./.github/workflows/deploy-nightly.yml
+    uses: ./.github/workflows/build-repos.yml
     with:
-      self-hosted-runners: ${{ fromJSON(needs.ci.outputs.jobs)['self-hosted-runners'] }}
-      github-hosted-runners: ${{ fromJSON(needs.ci.outputs.jobs)['github-hosted-runners'] }}
-      cache-seed: ${{ needs.ci.outputs.cache-seed }}
+      environment: nightly
       salt-version: "${{ needs.ci.outputs.salt-version }}"
+      dev-build: true
+    secrets:
+      FOO: ${{ secrets.FOO }}
+      SECRETS_KEY: ${{ secrets.SECRETS_KEY }}
+
+  publish-repositories:
+    name: Publish Repositories
+    needs:
+      - ci
+      - build-repositories
+    uses: ./.github/workflows/publish-repositories.yml
+    with:
+      environment: nightly
+    secrets: inherit
 
   set-pipeline-exit-status:
     # This step is just so we can make github require this step, to pass checks
     # on a pull request instead of requiring all
     name: Set the ${{ github.workflow }} Pipeline Exit Status
     if: always()
+    runs-on: ubuntu-latest
     needs:
-      - cd
-    uses: ./.github/workflows/set-workflow-conclusion.yml
+      - ci
+      - build-repositories
+      - publish-repositories
+    steps:
+      - name: Get workflow information
+        id: get-workflow-info
+        uses: technote-space/workflow-conclusion-action@v3
+
+      - name: Set Pipeline Exit Status
+        shell: bash
+        run: |
+          if [ "${{ steps.get-workflow-info.outputs.conclusion }}" != "success" ]; then
+            exit 1
+          else
+            exit 0
+          fi
+
+      - name: Done
+        if: always()
+        run:
+          echo "All worflows finished"
