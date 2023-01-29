@@ -1,0 +1,78 @@
+name: Prepare Release
+
+on:
+  workflow_call:
+    inputs:
+      salt-version:
+        type: string
+        required: true
+        description: The Salt version to set prior to creating the release diff.
+
+env:
+  COLUMNS: 160
+  PIP_INDEX_URL: https://pypi-proxy.saltstack.net/root/local/+simple/
+  PIP_EXTRA_INDEX_URL: https://pypi.org/simple
+
+jobs:
+  build:
+    name: Create Release Diff
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Setup Python Tools Scripts
+        uses: ./.github/actions/setup-python-tools-scripts
+
+      - name: Setup Salt Version
+        id: setup-salt-version
+        uses: ./.github/actions/setup-salt-version
+        with:
+          salt-version: "${{ inputs.salt-version }}"
+
+      - name: Update Debian changelog
+        shell: bash
+        run: |
+          tools changelog update-deb --draft
+          tools changelog update-deb
+
+      - name: Update RPM changelog
+        shell: bash
+        run: |
+          tools changelog update-rpm --draft
+          tools changelog update-rpm
+
+      - name: Update Release Notes
+        shell: bash
+        run: |
+          tools changelog update-release-notes --draft
+          tools changelog update-release-notes
+
+      - name: Update CHANGELOG.md
+        shell: bash
+        run: |
+          tools changelog update-release-notes --draft
+          tools changelog update-release-notes
+
+      - name: Update CHANGELOG.md
+        shell: bash
+        run: |
+          tools docs man
+
+      - name: Create release changes diff
+        shell: bash
+        run: |
+          git diff --no-color > salt-${{ inputs.salt-version }}.diff
+
+      - name: Upload Source Tarball as an Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: salt-${{ inputs.salt-version }}.diff
+          path: salt-${{ inputs.salt-version }}.diff
+          retention-days: 7
+          if-no-files-found: error
